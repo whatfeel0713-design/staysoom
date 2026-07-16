@@ -6,7 +6,14 @@
       "Bash(npm run *)",
       "Bash(echo \"build check done, exit=$?\")",
       "Bash(rm -rf node_modules)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(curl -s \"https://mzccaeyxtllhpfqribca.supabase.co/rest/v1/\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16Y2NhZXl4dGxsaHBmcXJpYmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5MzIzMzEsImV4cCI6MjA5OTUwODMzMX0.NR9m5C2Tl28S0g-DKL6iH9CuZFZu-ZrsrPh5mt__vY4\")",
+      "Bash(curl -s -i \"https://mzccaeyxtllhpfqribca.supabase.co/rest/v1/\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16Y2NhZXl4dGxsaHBmcXJpYmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5MzIzMzEsImV4cCI6MjA5OTUwODMzMX0.NR9m5C2Tl28S0g-DKL6iH9CuZFZu-ZrsrPh5mt__vY4\")",
+      "Bash(curl -s -o /dev/null -w \"HTTP_STATUS:%{http_code}\\\\n\" https://www.google.com --max-time 5)",
+      "Bash(echo \"exit:$?\")",
+      "Bash(npx tsc *)",
+      "WebSearch",
+      "Bash(git add *)"
     ]
   }
 }
