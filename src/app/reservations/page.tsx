@@ -12,6 +12,7 @@ export default function ReservationsPage() {
     createReservation,
     initialState
   );
+  const minDate = new Date().toISOString().slice(0, 10);
 
   return (
     <div className="flex flex-1 flex-col md:flex-row">
@@ -54,24 +55,45 @@ export default function ReservationsPage() {
           </p>
 
           <form action={formAction} className="mt-12 flex flex-col gap-9">
-            <label className="flex flex-col gap-1">
-              <span className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-stone">
-                예약자명
-              </span>
-              <input
-                name="name"
-                required
-                placeholder="성함을 입력해 주세요"
-                className="field-underline"
-              />
-            </label>
+            <div className="grid grid-cols-2 gap-8">
+              <label className="flex flex-col gap-1">
+                <span className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-stone">
+                  체크인
+                </span>
+                <input
+                  type="date"
+                  name="check_in"
+                  required
+                  min={minDate}
+                  className="field-underline"
+                />
+              </label>
+
+              <label className="flex flex-col gap-1">
+                <span className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-stone">
+                  체크아웃
+                </span>
+                <input
+                  type="date"
+                  name="check_out"
+                  required
+                  min={minDate}
+                  className="field-underline"
+                />
+              </label>
+            </div>
 
             <div className="grid grid-cols-2 gap-8">
               <label className="flex flex-col gap-1">
                 <span className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-stone">
-                  날짜
+                  예약자명
                 </span>
-                <input type="date" name="date" required className="field-underline" />
+                <input
+                  name="guest_name"
+                  required
+                  placeholder="성함을 입력해 주세요"
+                  className="field-underline"
+                />
               </label>
 
               <label className="flex flex-col gap-1">
@@ -80,10 +102,10 @@ export default function ReservationsPage() {
                 </span>
                 <input
                   type="number"
-                  name="partySize"
+                  name="guest_count"
                   min={1}
                   required
-                  placeholder="2"
+                  defaultValue={2}
                   className="field-underline"
                 />
               </label>
@@ -95,9 +117,21 @@ export default function ReservationsPage() {
               </span>
               <input
                 type="tel"
-                name="phone"
+                name="guest_phone"
                 required
                 placeholder="010-1234-5678"
+                className="field-underline"
+              />
+            </label>
+
+            <label className="flex flex-col gap-1">
+              <span className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-stone">
+                이메일 (선택)
+              </span>
+              <input
+                type="email"
+                name="guest_email"
+                placeholder="example@email.com"
                 className="field-underline"
               />
             </label>
