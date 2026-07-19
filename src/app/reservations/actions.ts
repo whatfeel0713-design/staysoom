@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
 import { sendReservationNotification } from "@/lib/notifications";
+import { overlapsBlockedRange, type BlockedRange } from "@/lib/availability";
 
 export interface ReservationFormState {
   status: "idle" | "success" | "error";
@@ -37,6 +38,27 @@ export async function createReservation(
 
   // RLS 정책상 익명 사용자도 status='pending' 예약 요청은 생성 가능 — service role 불필요.
   const supabase = await createClient();
+
+  // 마감된 날짜와 겹치면 접수 전에 바로 안내한다.
+  // RPC 조회 실패 시에는 검사 없이 접수 진행 — pending 접수일 뿐이고,
+  // 최종 방어는 확정 시점의 DB EXCLUDE 제약이 담당한다.
+  const { data: blockedRanges, error: blockedError } = await supabase.rpc(
+    "get_blocked_date_ranges"
+  );
+  if (blockedError) {
+    console.error(
+      "[reservations] blocked-range check skipped:",
+      blockedError.message
+    );
+  } else if (
+    overlapsBlockedRange(checkIn, checkOut, (blockedRanges as BlockedRange[]) ?? [])
+  ) {
+    return {
+      status: "error",
+      message:
+        "선택하신 기간에 이미 마감된 날짜가 포함되어 있습니다. 달력에서 예약 가능한 날짜를 확인해 주세요.",
+    };
+  }
   const { error } = await supabase.from("reservations").insert({
     guest_name: guestName,
     guest_phone: guestPhone,
