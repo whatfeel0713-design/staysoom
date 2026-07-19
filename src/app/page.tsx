@@ -532,13 +532,7 @@ export default async function Home() {
               <p className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-stone">
                 Address
               </p>
-              <p className="mt-2 text-ink-soft">
-                전라남도 신안, 압해도
-                <br />
-                상세 주소는 예약 확정 후 안내드립니다.
-                <br />
-                (프라이빗 스테이 특성상 비공개)
-              </p>
+              <p className="mt-2 text-ink-soft">{BRAND.address}</p>
             </div>
             <div>
               <p className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-stone">

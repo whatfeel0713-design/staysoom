@@ -20,8 +20,10 @@ export const BRAND = {
   taglineEn: "Breathe in, stay still.",
   /** 장소를 담은 한 줄 — 압해(押海), "바다를 안은 섬" */
   placeLine: "바다를 안은 섬, 압해",
-  /** 대표 이메일 (실제 사용 주소로 수정하세요) */
+  /** 대표 이메일 (실제 주소 개설 후 교체 예정) */
   email: "stay@stayaphae.com",
+  /** 도로명 주소 */
+  address: "전남광주통합특별시 신안군 압해읍 수련의금길 27",
   /** 인스타그램 URL */
   instagram: "https://instagram.com",
   /** 입실/퇴실 안내 */
