@@ -1,5 +1,5 @@
 import "server-only";
-import type { ReservationNotificationPayload } from "./types";
+import { adminReservationsUrl, type ReservationNotificationPayload } from "./types";
 
 function escapeHtml(value: string): string {
   return value
@@ -26,13 +26,16 @@ export async function sendReservationTelegramNotification(
     return;
   }
 
+  const adminUrl = adminReservationsUrl();
   const text =
     `📅 <b>새 예약이 접수되었습니다 (대기중)</b>\n` +
     `• 유입 경로: ${escapeHtml(reservation.channel ?? "홈페이지")}\n` +
-    `• 예약자명: ${escapeHtml(reservation.name)}\n` +
-    `• 날짜: ${escapeHtml(reservation.date)}\n` +
-    `• 인원수: ${reservation.partySize}명\n` +
-    `• 연락처: ${escapeHtml(reservation.phone)}`;
+    `• 예약자명: ${escapeHtml(reservation.guestName)}\n` +
+    `• 날짜: ${escapeHtml(reservation.checkIn)} ~ ${escapeHtml(reservation.checkOut)}\n` +
+    `• 인원수: ${reservation.guestCount}명\n` +
+    `• 연락처: ${escapeHtml(reservation.phone)}` +
+    (reservation.email ? `\n• 이메일: ${escapeHtml(reservation.email)}` : "") +
+    (adminUrl ? `\n• 확인하기: ${escapeHtml(adminUrl)}` : "");
 
   try {
     const res = await fetch(

@@ -1,5 +1,5 @@
 import "server-only";
-import type { ReservationNotificationPayload } from "./types";
+import { adminReservationsUrl, type ReservationNotificationPayload } from "./types";
 
 /**
  * Sends a new-reservation alert to a Google Chat space via an Incoming Webhook.
@@ -18,13 +18,16 @@ export async function sendReservationChatNotification(
     return;
   }
 
+  const adminUrl = adminReservationsUrl();
   const text =
     `📅 *새 예약이 접수되었습니다 (대기중)*\n` +
     `• 유입 경로: ${reservation.channel ?? "홈페이지"}\n` +
-    `• 예약자명: ${reservation.name}\n` +
-    `• 날짜: ${reservation.date}\n` +
-    `• 인원수: ${reservation.partySize}명\n` +
-    `• 연락처: ${reservation.phone}`;
+    `• 예약자명: ${reservation.guestName}\n` +
+    `• 날짜: ${reservation.checkIn} ~ ${reservation.checkOut}\n` +
+    `• 인원수: ${reservation.guestCount}명\n` +
+    `• 연락처: ${reservation.phone}` +
+    (reservation.email ? `\n• 이메일: ${reservation.email}` : "") +
+    (adminUrl ? `\n• 확인하기: ${adminUrl}` : "");
 
   try {
     const res = await fetch(webhookUrl, {
