@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
 import { sendReservationNotification } from "@/lib/notifications";
 import { overlapsBlockedRange, type BlockedRange } from "@/lib/availability";
+import { BRAND } from "@/lib/brand";
 
 export interface ReservationFormState {
   status: "idle" | "success" | "error";
@@ -34,6 +35,13 @@ export async function createReservation(
 
   if (checkOut <= checkIn) {
     return { status: "error", message: "체크아웃 날짜는 체크인 이후여야 합니다." };
+  }
+
+  if (guestCount > BRAND.maxGuests) {
+    return {
+      status: "error",
+      message: `최대 ${BRAND.maxGuests}인까지 머무실 수 있습니다. (${BRAND.capacityLabel})`,
+    };
   }
 
   // RLS 정책상 익명 사용자도 status='pending' 예약 요청은 생성 가능 — service role 불필요.

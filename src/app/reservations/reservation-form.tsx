@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { createReservation, type ReservationFormState } from "./actions";
 import { AvailabilityCalendar } from "./availability-calendar";
 import type { BlockedRange } from "@/lib/availability";
+import { BRAND } from "@/lib/brand";
 
 const initialState: ReservationFormState = { status: "idle" };
 
@@ -85,6 +86,7 @@ export function ReservationForm({
             type="number"
             name="guest_count"
             min={1}
+            max={BRAND.maxGuests}
             required
             defaultValue={2}
             className="field-underline"

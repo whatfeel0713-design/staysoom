@@ -61,9 +61,10 @@ export default async function ReservationsPage() {
             예약하기
           </h1>
           <p className="mt-5 text-sm leading-7 text-stone">
-            예약 가능한 날짜를 확인하고 내용을 남겨주시면 확인 후 연락드립니다.
+            하루 한 팀만 모시는 독채 스테이입니다. 예약 가능한 날짜를 확인하고
+            내용을 남겨주시면 확인 후 연락드립니다.
             <br />
-            {BRAND.checkInOut}
+            {BRAND.checkInOut} · {BRAND.capacityLabel}
           </p>
 
           <ReservationForm blockedRanges={blockedRanges} />

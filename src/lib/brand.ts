@@ -5,7 +5,7 @@
  * 이 파일 밖에서 바꾸는 것들:
  * - 컬러: src/app/globals.css 상단의 CSS 변수 (--cream, --ink, --sand 등)
  * - 서체(무드): src/app/layout.tsx 의 폰트 설정
- * - 사진·객실명·소개 문구: src/app/page.tsx 상단의 STAYS / EXPERIENCES / AMENITIES 배열
+ * - 사진·공간 소개 문구: src/app/page.tsx 상단의 SPACES / EXPERIENCES / AMENITIES 배열
  */
 export const BRAND = {
   /** 한글 브랜드명 */
@@ -24,4 +24,8 @@ export const BRAND = {
   instagram: "https://instagram.com",
   /** 입실/퇴실 안내 */
   checkInOut: "입실 15:00 · 퇴실 11:00",
+  /** 수용 인원 안내 문구 — 실제 인원 기준으로 수정하세요 */
+  capacityLabel: "기준 2인 · 최대 4인",
+  /** 최대 인원 (예약 폼 입력 제한과 서버 검증에 사용) */
+  maxGuests: 4,
 } as const;

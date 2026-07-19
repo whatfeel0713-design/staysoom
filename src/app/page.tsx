@@ -6,29 +6,29 @@ import { BRAND } from "@/lib/brand";
 /**
  * 콘텐츠 데이터 — 실제 스테이 정보/사진이 준비되면 이 배열만 교체하면 됩니다.
  * 이미지는 Unsplash 플레이스홀더입니다.
+ *
+ * 스테이숨은 하루 한 팀만 받는 단일 독채 — SPACES는 "객실 목록"이 아니라
+ * 그 한 채를 이루는 공간들의 장면입니다.
  */
-const STAYS = [
+const SPACES = [
   {
-    name: "숨, 하나",
-    nameEn: "SOOM ONE",
-    description: "숲을 향해 열린 통창 아래, 온전히 혼자 또는 둘을 위한 공간.",
-    capacity: "기준 2인 · 최대 2인",
+    name: "숨의 방",
+    nameEn: "THE BEDROOM",
+    description: "숲을 향해 열린 통창 아래, 안개가 걷히는 능선을 바라보며 깨어나는 침실.",
     image:
       "https://images.unsplash.com/photo-1615874959474-d609969a20ed?q=80&w=1800&auto=format&fit=crop",
   },
   {
-    name: "숨, 둘",
-    nameEn: "SOOM TWO",
-    description: "낮은 조도와 따뜻한 목재의 결. 하루의 속도를 늦추는 스위트.",
-    capacity: "기준 2인 · 최대 4인",
+    name: "거실과 부엌",
+    nameEn: "THE LIVING",
+    description: "낮은 조도와 따뜻한 목재의 결. 창밖 숲을 마주하고 커피를 내리는 자리.",
     image:
       "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1800&auto=format&fit=crop",
   },
   {
-    name: "숨, 셋",
-    nameEn: "SOOM THREE",
-    description: "빛이 머무는 거실과 프라이빗 마당. 가족을 위한 독채 스테이.",
-    capacity: "기준 4인 · 최대 6인",
+    name: "마당과 파이어핏",
+    nameEn: "THE GARDEN",
+    description: "빛이 머무는 프라이빗 마당. 밤에는 불을 올리고 하루를 조용히 정리하는 곳.",
     image:
       "https://images.unsplash.com/photo-1493809842364-78817add7ffb?q=80&w=1800&auto=format&fit=crop",
   },
@@ -120,7 +120,7 @@ function ConciergeIcon({ name }: { name: string }) {
 }
 
 const AMENITIES = [
-  { title: "프라이빗 독채", body: "모든 객실은 단 한 팀만을 위한 독립된 공간입니다." },
+  { title: "하루 한 팀", body: "독채 전체를 단 한 팀이 온전히 사용합니다." },
   { title: "웰컴 티 세트", body: "계절의 차와 다과를 준비해 두었습니다." },
   { title: "스페셜티 커피", body: "핸드드립 도구와 갓 볶은 원두가 머무는 동안 제공됩니다." },
   { title: "아웃도어 배스", body: "숲을 바라보며 몸을 데우는 노천 스타일 욕조." },
@@ -209,46 +209,55 @@ export default function Home() {
           <Reveal className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-[0.7rem] font-medium uppercase tracking-[0.45em] text-bronze">
-                Stays
+                The Stay
               </p>
               <h2 className="mt-5 font-serif text-3xl font-light tracking-tight text-ink md:text-4xl">
-                세 개의 숨, 세 가지 머무름
+                하루에 단 한 팀,
+                <br className="md:hidden" /> 집 전체의 숨
               </h2>
             </div>
-            <p className="max-w-sm text-sm leading-7 text-stone">
-              각기 다른 풍경과 결을 가진 세 채의 독채. 어느 곳에 머물러도
-              단 한 팀만을 위한 공간입니다.
-            </p>
+            <div className="max-w-sm">
+              <p className="text-sm leading-7 text-stone">
+                침실부터 마당까지, 독채 전체가 오직 한 팀의 것이 됩니다. 다른
+                투숙객과 마주칠 일 없이 집의 모든 공간을 그대로 누리세요.
+              </p>
+              <p className="mt-3 text-xs tracking-wide text-bronze">
+                독채 전체 사용 · {BRAND.capacityLabel}
+              </p>
+            </div>
           </Reveal>
 
           <div className="mt-14 grid gap-10 md:mt-20 md:grid-cols-3 md:gap-8">
-            {STAYS.map((stay, i) => (
-              <Reveal key={stay.nameEn} delay={(i % 3) as 0 | 1 | 2}>
-                <Link href="/reservations" className="group block">
-                  <figure className="img-zoom relative aspect-[3/4] w-full overflow-hidden rounded-sm">
-                    <Image
-                      src={stay.image}
-                      alt={`${stay.name} 객실 전경`}
-                      fill
-                      sizes="(min-width: 768px) 33vw, 100vw"
-                      className="object-cover"
-                    />
-                  </figure>
-                  <div className="mt-6 flex items-baseline justify-between">
-                    <h3 className="font-serif text-xl text-ink">{stay.name}</h3>
-                    <span className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-stone">
-                      {stay.nameEn}
-                    </span>
-                  </div>
-                  <p className="mt-3 text-sm leading-7 text-stone">{stay.description}</p>
-                  <p className="mt-3 text-xs tracking-wide text-bronze">{stay.capacity}</p>
-                  <span className="mt-5 inline-block border-b border-ink/25 pb-0.5 text-sm text-ink transition-all duration-300 group-hover:border-ink">
-                    자세히 보기 →
+            {SPACES.map((space, i) => (
+              <Reveal key={space.nameEn} delay={(i % 3) as 0 | 1 | 2}>
+                <figure className="img-zoom relative aspect-[3/4] w-full overflow-hidden rounded-sm">
+                  <Image
+                    src={space.image}
+                    alt={`${space.name} 전경`}
+                    fill
+                    sizes="(min-width: 768px) 33vw, 100vw"
+                    className="object-cover"
+                  />
+                </figure>
+                <div className="mt-6 flex items-baseline justify-between">
+                  <h3 className="font-serif text-xl text-ink">{space.name}</h3>
+                  <span className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-stone">
+                    {space.nameEn}
                   </span>
-                </Link>
+                </div>
+                <p className="mt-3 text-sm leading-7 text-stone">{space.description}</p>
               </Reveal>
             ))}
           </div>
+
+          <Reveal className="mt-14 flex justify-center md:mt-20">
+            <Link
+              href="/reservations"
+              className="rounded-full border border-ink/30 px-9 py-3.5 text-sm font-medium tracking-wide text-ink transition-all duration-300 hover:border-ink hover:bg-ink hover:text-cream"
+            >
+              이 집의 하루를 예약하기
+            </Link>
+          </Reveal>
         </div>
       </section>
 
@@ -318,7 +327,7 @@ export default function Home() {
               아주 작은 AI
             </h2>
             <p className="mt-8 text-base leading-9 text-cream/65">
-              객실에 놓인 QR 하나면 충분합니다. 바베큐 준비부터 길 안내,
+              집 안에 놓인 QR 하나면 충분합니다. 바베큐 준비부터 길 안내,
               동네 맛집과 숨은 혜택까지 — {BRAND.name}의 컨시어지가 머무는 동안
               필요한 모든 것을 조용히 곁에서 챙깁니다.
             </p>
@@ -352,7 +361,7 @@ export default function Home() {
               </a>
             ) : (
               <p className="rounded-full border border-white/20 px-7 py-3 text-xs tracking-[0.2em] text-cream/60">
-                체크인 시 객실 QR 카드로 만나실 수 있습니다 — 준비 중
+                체크인 시 안내되는 QR 카드로 만나실 수 있습니다 — 준비 중
               </p>
             )}
             <p className="max-w-md text-xs leading-6 text-cream/40">

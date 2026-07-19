@@ -13,7 +13,8 @@
 
 - `src/lib/brand.ts` — 브랜드명·슬로건·이메일 등 아이덴티티 설정. 브랜드명 변경 시 이 파일만 수정.
 - `src/app/globals.css` — 디자인 토큰(크림/잉크/스톤/브론즈 팔레트), 리빌 애니메이션, 폼 스타일.
-- `src/app/page.tsx` — 메인 랜딩. 상단의 `STAYS` / `EXPERIENCES` / `CONCIERGE_FEATURES` / `AMENITIES` 배열이 콘텐츠 데이터. `CONCIERGE_LINK`에 URL을 넣으면 AI 컨시어지 섹션의 "준비 중" 안내가 링크 버튼으로 바뀐다.
+- **스테이숨은 하루 한 팀만 받는 단일 독채다.** 객실/유닛 개념이 없으므로 예약·캘린더·문구 모두 단일 유닛 전제로 작성한다(`reservations`에 `room_id` 없음). 수용 인원은 `src/lib/brand.ts`의 `capacityLabel`/`maxGuests`로 관리.
+- `src/app/page.tsx` — 메인 랜딩. 상단의 `SPACES`(독채를 이루는 공간 장면들) / `EXPERIENCES` / `CONCIERGE_FEATURES` / `AMENITIES` 배열이 콘텐츠 데이터. `CONCIERGE_LINK`에 URL을 넣으면 AI 컨시어지 섹션의 "준비 중" 안내가 링크 버튼으로 바뀐다.
 - `src/app/reservations/` — 공개 예약 폼(서버 액션) → Supabase `reservations` 테이블에 `pending` 상태로 저장 + 텔레그램/구글챗 알림(`src/lib/notifications/`). 폼 위 가용성 달력은 `get_blocked_date_ranges` RPC(확정 예약 + 외부 캘린더 차단일, 익명 호출 가능)로 마감일을 표시하고, 서버 액션도 접수 전에 같은 RPC로 겹침을 검사한다(날짜 로직은 `src/lib/availability.ts`).
 - `src/app/admin/` — 관리자 영역. `/admin/login`(이메일/비밀번호)은 가드 밖, 나머지는 `(protected)` 라우트 그룹 안. 콘텐츠 관리(`/admin/content`), 예약 관리(`/admin/reservations`), 외부 캘린더 동기화(`/admin/calendar`).
 - `src/middleware.ts` + `src/utils/supabase/` — 세션 갱신과 `/admin/*` 가드. `client.ts`(브라우저)/`server.ts`(서버 컴포넌트·액션)/`admin.ts`(service role, 크론 전용) 클라이언트를 반드시 용도에 맞게 구분해서 사용한다. `src/lib/` 아래에 Supabase 클라이언트를 새로 만들지 말 것.
