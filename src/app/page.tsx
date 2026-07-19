@@ -56,10 +56,10 @@ const EXPERIENCES = [
 
 /**
  * 압해 컨시어지(AI 스테이 프로그램) 기능 목록.
- * 프로그램이 완성되면 CONCIERGE_LINK 에 실제 URL을 넣으세요 —
- * 섹션 하단 안내가 자동으로 링크 버튼으로 바뀝니다.
+ * CONCIERGE_LINK: 현재는 게스트 가이드(/guide). AI 챗 컨시어지가 완성되면
+ * 그 URL로 교체 — null로 두면 "준비 중" 안내로 돌아갑니다.
  */
-const CONCIERGE_LINK: string | null = null;
+const CONCIERGE_LINK: string | null = "/guide";
 
 const CONCIERGE_FEATURES = [
   { icon: "flame", title: "바베큐 예약", body: "원하는 시간에 맞춰 준비되는 프라이빗 바베큐." },
