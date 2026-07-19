@@ -9,17 +9,19 @@
  */
 export const BRAND = {
   /** 한글 브랜드명 */
-  name: "스테이숨",
+  name: "스테이 압해",
   /** 로마자 표기 (로고 옆, 푸터 등) */
-  nameEn: "Staysoom",
+  nameEn: "Stay Aphae",
   /** 대문자 로마자 (© 표기 등) */
-  nameEnUpper: "STAYSOOM",
+  nameEnUpper: "STAY APHAE",
   /** 한 줄 슬로건 */
   tagline: "머무는 것만으로 쉼이 되는 곳",
   /** 푸터 영문 슬로건 */
   taglineEn: "Breathe in, stay still.",
-  /** 대표 이메일 */
-  email: "stay@staysoom.com",
+  /** 장소를 담은 한 줄 — 압해(押海), "바다를 안은 섬" */
+  placeLine: "바다를 안은 섬, 압해",
+  /** 대표 이메일 (실제 사용 주소로 수정하세요) */
+  email: "stay@stayaphae.com",
   /** 인스타그램 URL */
   instagram: "https://instagram.com",
   /** 입실/퇴실 안내 */

@@ -11,6 +11,8 @@ function parseContentBlockForm(formData: FormData) {
   const type = String(formData.get("type") ?? "");
   const title = String(formData.get("title") ?? "").trim();
   const mediaUrl = String(formData.get("media_url") ?? "").trim();
+  const body = String(formData.get("body") ?? "").trim();
+  const sortOrder = Number(formData.get("sort_order") ?? 0);
   const isActive = formData.get("is_active") === "on";
 
   if (!title || !CONTENT_TYPES.includes(type as ContentType)) {
@@ -21,6 +23,8 @@ function parseContentBlockForm(formData: FormData) {
     type: type as ContentType,
     title,
     media_url: mediaUrl || null,
+    body: body || null,
+    sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
     is_active: isActive,
   };
 }

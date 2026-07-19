@@ -24,7 +24,7 @@ const notoSerifKr = Noto_Serif_KR({
 
 export const metadata: Metadata = {
   title: `${BRAND.name} | ${BRAND.nameEnUpper} — ${BRAND.tagline}`,
-  description: `${BRAND.name}은 자연 속에서 온전한 쉼을 위해 설계된 프라이빗 스테이입니다. 머무름 그 자체가 여행이 되는 공간을 경험하세요.`,
+  description: `${BRAND.placeLine} — 섬의 속도로 쉬어가도록 설계된 하루 한 팀 프라이빗 독채, ${BRAND.name}입니다.`,
   openGraph: {
     title: `${BRAND.name} | ${BRAND.nameEnUpper}`,
     description: `${BRAND.tagline}, 프라이빗 스테이 ${BRAND.name}.`,

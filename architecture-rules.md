@@ -1,4 +1,6 @@
-# 스테이숨(StaySoom) 아키텍처 원칙
+# 스테이 압해(Stay Aphae) 아키텍처 원칙
+
+> 브랜드명은 `src/lib/brand.ts`에서만 관리한다. (구명 스테이숨/StaySoom — 리포지토리명 등 인프라 식별자는 staysoom 유지)
 
 ## 기술 스택 및 배포
 

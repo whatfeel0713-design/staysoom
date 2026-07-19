@@ -18,16 +18,16 @@ export async function GET() {
   const events = ranges
     .map(
       (r, i) =>
-        `BEGIN:VEVENT\r\nUID:staysoom-${r.check_in}-${r.check_out}-${i}@staysoom\r\nDTSTART;VALUE=DATE:${formatICSDate(r.check_in)}\r\nDTEND;VALUE=DATE:${formatICSDate(r.check_out)}\r\nSUMMARY:Reserved\r\nEND:VEVENT`,
+        `BEGIN:VEVENT\r\nUID:stay-aphae-${r.check_in}-${r.check_out}-${i}@stay-aphae\r\nDTSTART;VALUE=DATE:${formatICSDate(r.check_in)}\r\nDTEND;VALUE=DATE:${formatICSDate(r.check_out)}\r\nSUMMARY:Reserved\r\nEND:VEVENT`,
     )
     .join("\r\n");
 
-  const ics = `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//StaySoom//Reservations//KO\r\n${events}${events ? "\r\n" : ""}END:VCALENDAR\r\n`;
+  const ics = `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//StayAphae//Reservations//KO\r\n${events}${events ? "\r\n" : ""}END:VCALENDAR\r\n`;
 
   return new NextResponse(ics, {
     headers: {
       "Content-Type": "text/calendar; charset=utf-8",
-      "Content-Disposition": 'inline; filename="staysoom.ics"',
+      "Content-Disposition": 'inline; filename="stay-aphae.ics"',
     },
   });
 }
