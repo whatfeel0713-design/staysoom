@@ -22,6 +22,15 @@
 - `supabase/migrations/` — DB 스키마. 중복예약 방지는 `reservations` 테이블의 EXCLUDE 제약(`confirmed` 상태끼리 날짜 겹침 차단)이 DB 레벨에서 강제한다.
 - 환경 변수는 `.env.local` (gitignore됨) — 목록은 `.env.local.example` 참고.
 - 아키텍처 원칙과 트러블슈팅 누적 기록은 `architecture-rules.md` 참고 (RLS 재귀 함정, Server Component 폴백 패턴 등).
+- 향후 구축 로드맵(오픈 전 체크리스트, 4순위 이후 고도화 단계)은 `roadmap.md` 참고.
+
+## 배포 인프라 (확정 방향, 2026-07)
+
+- **호스팅: Vercel** — GitHub 리포 연결로 push 자동 배포. 순서: ① Vercel 배포(`*.vercel.app`으로 전체 기능 검증) → ② 도메인 구매(`stayaphae.com` 권장) → ③ Vercel 도메인 연결(SSL 자동) → ④ Google Workspace(운영자 수신용 이메일, MX 레코드) → ⑤ Resend(예약 자동 발송용, 4순위 전제).
+- 상업 사이트이므로 Vercel **Pro 플랜**($20/월)이 약관상 정석. Hobby로 시작할 경우 `vercel.json`의 크론(현재 매시 정각)을 하루 1회로 낮춰야 한다(Hobby 크론 제한).
+- Vercel 환경 변수: `.env.local.example`의 전체 목록을 프로젝트 설정에 직접 등록해야 한다(파일은 자동 반영 안 됨). `CRON_SECRET`은 같은 이름으로 등록하면 Vercel Cron이 `Authorization: Bearer` 헤더를 자동으로 붙인다.
+- **도메인 연결 시 함께 갱신할 것**: `NEXT_PUBLIC_SITE_URL`, Supabase Auth의 Site URL/Redirect URLs(관리자 로그인), 에어비앤비 등에 등록한 iCal export 피드 URL.
+- **이메일은 용도별로 분리**: 사람이 주고받는 운영 메일 = Google Workspace / 코드가 API로 보내는 자동 메일(예약 확인 등) = Resend. DNS의 SPF TXT 레코드는 하나로 병합해야 한다(`v=spf1 include:_spf.google.com include:<resend 지정값> ~all` 형태 — 도메인당 SPF 레코드는 1개만 유효).
 
 ## 주의사항
 
