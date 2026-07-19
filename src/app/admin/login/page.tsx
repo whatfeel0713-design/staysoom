@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import { BRAND } from "@/lib/brand";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -36,11 +37,11 @@ export default function AdminLoginPage() {
     <div className="flex min-h-screen flex-1 items-center justify-center bg-stone-50 px-6">
       <div className="w-full max-w-sm rounded-2xl border border-stone-200 bg-white p-8 shadow-sm">
         <p className="text-sm font-semibold tracking-[0.2em] text-teal-700 uppercase">
-          StaySoom
+          {BRAND.nameEn}
         </p>
         <h1 className="mt-2 text-2xl font-bold text-stone-900">관리자 로그인</h1>
         <p className="mt-2 text-sm text-stone-500">
-          스테이숨 홈페이지 콘텐츠를 관리하려면 로그인해 주세요.
+          {BRAND.name} 홈페이지 콘텐츠를 관리하려면 로그인해 주세요.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">

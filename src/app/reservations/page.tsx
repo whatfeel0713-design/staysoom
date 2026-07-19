@@ -1,18 +1,30 @@
-"use client";
-
 import Image from "next/image";
-import { useActionState } from "react";
-import { createReservation, type ReservationFormState } from "./actions";
+import { createClient } from "@/utils/supabase/server";
 import { BRAND } from "@/lib/brand";
+import type { BlockedRange } from "@/lib/availability";
+import { ReservationForm } from "./reservation-form";
 
-const initialState: ReservationFormState = { status: "idle" };
+/**
+ * 예약 불가 기간(확정 예약 + 외부 캘린더 차단일) 조회.
+ * RPC 미적용·네트워크 장애 시에도 페이지가 죽지 않도록 빈 배열로 폴백 —
+ * 최종 방어는 서버 액션의 겹침 검사와 DB EXCLUDE 제약이 담당한다.
+ */
+async function getBlockedRanges(): Promise<BlockedRange[]> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("get_blocked_date_ranges");
+    if (error) {
+      console.error("[reservations] blocked ranges fetch failed:", error.message);
+      return [];
+    }
+    return (data as BlockedRange[]) ?? [];
+  } catch {
+    return [];
+  }
+}
 
-export default function ReservationsPage() {
-  const [state, formAction, isPending] = useActionState(
-    createReservation,
-    initialState
-  );
-  const minDate = new Date().toISOString().slice(0, 10);
+export default async function ReservationsPage() {
+  const blockedRanges = await getBlockedRanges();
 
   return (
     <div className="flex flex-1 flex-col md:flex-row">
@@ -49,112 +61,13 @@ export default function ReservationsPage() {
             예약하기
           </h1>
           <p className="mt-5 text-sm leading-7 text-stone">
-            아래 내용을 남겨주시면 확인 후 연락드립니다.
+            하루 한 팀만 모시는 독채 스테이입니다. 예약 가능한 날짜를 확인하고
+            내용을 남겨주시면 확인 후 연락드립니다.
             <br />
-            {BRAND.checkInOut}
+            {BRAND.checkInOut} · {BRAND.capacityLabel}
           </p>
 
-          <form action={formAction} className="mt-12 flex flex-col gap-9">
-            <div className="grid grid-cols-2 gap-8">
-              <label className="flex flex-col gap-1">
-                <span className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-stone">
-                  체크인
-                </span>
-                <input
-                  type="date"
-                  name="check_in"
-                  required
-                  min={minDate}
-                  className="field-underline"
-                />
-              </label>
-
-              <label className="flex flex-col gap-1">
-                <span className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-stone">
-                  체크아웃
-                </span>
-                <input
-                  type="date"
-                  name="check_out"
-                  required
-                  min={minDate}
-                  className="field-underline"
-                />
-              </label>
-            </div>
-
-            <div className="grid grid-cols-2 gap-8">
-              <label className="flex flex-col gap-1">
-                <span className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-stone">
-                  예약자명
-                </span>
-                <input
-                  name="guest_name"
-                  required
-                  placeholder="성함을 입력해 주세요"
-                  className="field-underline"
-                />
-              </label>
-
-              <label className="flex flex-col gap-1">
-                <span className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-stone">
-                  인원수
-                </span>
-                <input
-                  type="number"
-                  name="guest_count"
-                  min={1}
-                  required
-                  defaultValue={2}
-                  className="field-underline"
-                />
-              </label>
-            </div>
-
-            <label className="flex flex-col gap-1">
-              <span className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-stone">
-                연락처
-              </span>
-              <input
-                type="tel"
-                name="guest_phone"
-                required
-                placeholder="010-1234-5678"
-                className="field-underline"
-              />
-            </label>
-
-            <label className="flex flex-col gap-1">
-              <span className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-stone">
-                이메일 (선택)
-              </span>
-              <input
-                type="email"
-                name="guest_email"
-                placeholder="example@email.com"
-                className="field-underline"
-              />
-            </label>
-
-            <button
-              type="submit"
-              disabled={isPending}
-              className="mt-4 rounded-full bg-ink px-8 py-4 text-sm font-medium tracking-wide text-cream transition-all duration-300 hover:bg-ink-soft hover:shadow-lg hover:shadow-ink/20 disabled:opacity-50"
-            >
-              {isPending ? "접수 중..." : "예약 접수하기"}
-            </button>
-
-            {state.status !== "idle" && (
-              <p
-                role="status"
-                className={`text-sm leading-6 ${
-                  state.status === "success" ? "text-bronze" : "text-red-600"
-                }`}
-              >
-                {state.message}
-              </p>
-            )}
-          </form>
+          <ReservationForm blockedRanges={blockedRanges} />
         </div>
       </div>
     </div>

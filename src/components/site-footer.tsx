@@ -59,6 +59,7 @@ export function SiteFooter() {
               >
                 Instagram
               </a>
+              <p className="text-ink-soft/80">{BRAND.address}</p>
             </div>
           </div>
         </div>

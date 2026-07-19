@@ -2,33 +2,34 @@ import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 import { BRAND } from "@/lib/brand";
+import { createClient } from "@/utils/supabase/server";
 
 /**
  * 콘텐츠 데이터 — 실제 스테이 정보/사진이 준비되면 이 배열만 교체하면 됩니다.
  * 이미지는 Unsplash 플레이스홀더입니다.
+ *
+ * 스테이 압해는 하루 한 팀만 받는 단일 독채 — SPACES는 "객실 목록"이 아니라
+ * 그 한 채를 이루는 공간들의 장면입니다.
  */
-const STAYS = [
+const SPACES = [
   {
-    name: "숨, 하나",
-    nameEn: "SOOM ONE",
-    description: "숲을 향해 열린 통창 아래, 온전히 혼자 또는 둘을 위한 공간.",
-    capacity: "기준 2인 · 최대 2인",
+    name: "숨의 방",
+    nameEn: "THE BEDROOM",
+    description: "섬의 아침빛이 통창으로 스며드는 침실. 하루의 처음을 가장 느리게 시작하는 곳.",
     image:
       "https://images.unsplash.com/photo-1615874959474-d609969a20ed?q=80&w=1800&auto=format&fit=crop",
   },
   {
-    name: "숨, 둘",
-    nameEn: "SOOM TWO",
-    description: "낮은 조도와 따뜻한 목재의 결. 하루의 속도를 늦추는 스위트.",
-    capacity: "기준 2인 · 최대 4인",
+    name: "거실과 부엌",
+    nameEn: "THE LIVING",
+    description: "낮은 조도와 따뜻한 목재의 결. 창밖 풍경을 마주하고 커피를 내리는 자리.",
     image:
       "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1800&auto=format&fit=crop",
   },
   {
-    name: "숨, 셋",
-    nameEn: "SOOM THREE",
-    description: "빛이 머무는 거실과 프라이빗 마당. 가족을 위한 독채 스테이.",
-    capacity: "기준 4인 · 최대 6인",
+    name: "마당과 파이어핏",
+    nameEn: "THE GARDEN",
+    description: "향나무가 줄지어 선 프라이빗 마당. 밤에는 불을 올리고 하루를 조용히 정리하는 곳.",
     image:
       "https://images.unsplash.com/photo-1493809842364-78817add7ffb?q=80&w=1800&auto=format&fit=crop",
   },
@@ -38,15 +39,15 @@ const EXPERIENCES = [
   {
     label: "01 — Stillness",
     title: "아무것도 하지 않을 자유",
-    body: `${BRAND.name}의 하루는 비워내는 것에서 시작합니다. 텔레비전 대신 창밖의 숲을, 알람 대신 새소리를 두었습니다. 머무는 동안만큼은 시간이 당신을 재촉하지 않습니다.`,
+    body: `${BRAND.name}의 하루는 비워내는 것에서 시작합니다. 텔레비전 대신 바람에 흔들리는 향나무를, 알람 대신 새소리를 두었습니다. 머무는 동안만큼은 시간이 당신을 재촉하지 않습니다.`,
     image:
       "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1800&auto=format&fit=crop",
     alt: "빛이 스며드는 숲",
   },
   {
     label: "02 — Morning",
-    title: "숲의 아침으로 깨어나는 일",
-    body: `침대에 누운 채로 안개가 걷히는 능선을 바라보세요. 준비된 원두를 내리고, 창을 열어 새벽 공기를 방 안으로 들이는 것. 그것이 ${BRAND.name}의 모닝 리추얼입니다.`,
+    title: "섬의 아침으로 깨어나는 일",
+    body: `침대에 누운 채로 섬의 아침이 서서히 환해지는 것을 바라보세요. 준비된 원두를 내리고, 창을 열어 새벽 공기를 방 안으로 들이는 것. 그것이 ${BRAND.name}의 모닝 리추얼입니다.`,
     image:
       "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1800&auto=format&fit=crop",
     alt: "창밖 풍경이 보이는 침실",
@@ -54,7 +55,7 @@ const EXPERIENCES = [
 ];
 
 /**
- * 숨 컨시어지(AI 스테이 프로그램) 기능 목록.
+ * 압해 컨시어지(AI 스테이 프로그램) 기능 목록.
  * 프로그램이 완성되면 CONCIERGE_LINK 에 실제 URL을 넣으세요 —
  * 섹션 하단 안내가 자동으로 링크 버튼으로 바뀝니다.
  */
@@ -120,22 +121,76 @@ function ConciergeIcon({ name }: { name: string }) {
 }
 
 const AMENITIES = [
-  { title: "프라이빗 독채", body: "모든 객실은 단 한 팀만을 위한 독립된 공간입니다." },
+  { title: "하루 한 팀", body: "독채 전체를 단 한 팀이 온전히 사용합니다." },
   { title: "웰컴 티 세트", body: "계절의 차와 다과를 준비해 두었습니다." },
   { title: "스페셜티 커피", body: "핸드드립 도구와 갓 볶은 원두가 머무는 동안 제공됩니다." },
-  { title: "아웃도어 배스", body: "숲을 바라보며 몸을 데우는 노천 스타일 욕조." },
+  { title: "아웃도어 배스", body: "마당의 향나무를 바라보며 몸을 데우는 노천 스타일 욕조." },
   { title: "린넨 & 어메니티", body: "고밀도 린넨 침구와 저자극 내추럴 어메니티." },
   { title: "불멍 파이어핏", body: "밤에는 마당의 파이어핏에서 하루를 정리하세요." },
 ];
 
-export default function Home() {
+/** /admin/content 에서 관리하는 랜딩 동적 콘텐츠 */
+interface ContentBlock {
+  id: string;
+  type: "banner" | "room" | "youtube" | "testimonial";
+  title: string;
+  media_url: string | null;
+  body: string | null;
+  sort_order: number;
+}
+
+/**
+ * 활성 콘텐츠 블록 조회 — 실패(env 미설정, 마이그레이션 미적용 등) 시 빈 배열로
+ * 폴백해 아래 하드코딩된 기본 콘텐츠가 대신 렌더링된다.
+ */
+async function getContentBlocks(): Promise<ContentBlock[]> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("content_blocks")
+      .select("id, type, title, media_url, body, sort_order")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: true });
+    if (error) {
+      console.error("[home] content_blocks fetch failed:", error.message);
+      return [];
+    }
+    return (data as ContentBlock[]) ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export default async function Home() {
+  const blocks = await getContentBlocks();
+
+  const heroBanner = blocks.find((b) => b.type === "banner" && b.media_url);
+  const roomBlocks = blocks.filter((b) => b.type === "room");
+  const youtubeBlock = blocks.find((b) => b.type === "youtube" && b.media_url);
+  const testimonials = blocks.filter((b) => b.type === "testimonial");
+
+  // 관리자가 등록한 공간 장면이 있으면 그것을, 없으면 기본 SPACES를 렌더링.
+  // 이미지가 없는 블록은 기본 플레이스홀더 이미지를 돌려쓴다.
+  const sceneCards = roomBlocks.length
+    ? roomBlocks.map((b, i) => ({
+        name: b.title,
+        nameEn: `SCENE ${String(i + 1).padStart(2, "0")}`,
+        description: b.body ?? "",
+        image: b.media_url ?? SPACES[i % SPACES.length].image,
+      }))
+    : SPACES;
+
   return (
     <div className="flex flex-col">
       {/* ---------- Hero ---------- */}
       <section className="relative flex min-h-svh items-center justify-center overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=80&w=2600&auto=format&fit=crop"
-          alt="안개 낀 호수와 숲 속의 스테이"
+          src={
+            heroBanner?.media_url ??
+            "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=80&w=2600&auto=format&fit=crop"
+          }
+          alt={heroBanner?.title ?? "안개 낀 호수와 숲 속의 스테이"}
           fill
           priority
           sizes="100vw"
@@ -153,9 +208,9 @@ export default function Home() {
             쉼이 되는 곳
           </h1>
           <p className="hero-rise hero-rise-3 mt-7 max-w-md text-base font-light leading-8 text-white/85 md:text-lg">
-            숨을 고르듯, 하루를 고르는 시간.
+            {BRAND.placeLine} — 숨을 고르듯 하루를 고르는 시간.
             <br className="hidden sm:block" />
-            자연 속에서 온전한 쉼을 위해 설계된 {BRAND.name}입니다.
+            섬의 속도로 쉬어가도록 설계된 {BRAND.name}입니다.
           </p>
           <div className="hero-rise hero-rise-3 mt-10 flex flex-col gap-3 sm:flex-row">
             <Link
@@ -197,7 +252,7 @@ export default function Home() {
         <Reveal delay={2}>
           <p className="mt-10 max-w-xl text-base leading-9 text-stone md:text-lg">
             {BRAND.name}은 무언가를 더하는 여행이 아니라, 덜어내는 여행을 제안합니다.
-            소음과 일정, 해야 할 일들을 잠시 내려놓고 — 자연의 속도에 몸을 맡기는
+            소음과 일정, 해야 할 일들을 잠시 내려놓고 — 섬의 속도에 몸을 맡기는
             것. 그 단순한 경험을 위해 공간의 모든 요소를 설계했습니다.
           </p>
         </Reveal>
@@ -209,46 +264,57 @@ export default function Home() {
           <Reveal className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-[0.7rem] font-medium uppercase tracking-[0.45em] text-bronze">
-                Stays
+                The Stay
               </p>
               <h2 className="mt-5 font-serif text-3xl font-light tracking-tight text-ink md:text-4xl">
-                세 개의 숨, 세 가지 머무름
+                하루에 단 한 팀,
+                <br className="md:hidden" /> 집 전체의 숨
               </h2>
             </div>
-            <p className="max-w-sm text-sm leading-7 text-stone">
-              각기 다른 풍경과 결을 가진 세 채의 독채. 어느 곳에 머물러도
-              단 한 팀만을 위한 공간입니다.
-            </p>
+            <div className="max-w-sm">
+              <p className="text-sm leading-7 text-stone">
+                침실부터 마당까지, 독채 전체가 오직 한 팀의 것이 됩니다. 다른
+                투숙객과 마주칠 일 없이 집의 모든 공간을 그대로 누리세요.
+              </p>
+              <p className="mt-3 text-xs tracking-wide text-bronze">
+                독채 전체 사용 · {BRAND.capacityLabel}
+              </p>
+            </div>
           </Reveal>
 
           <div className="mt-14 grid gap-10 md:mt-20 md:grid-cols-3 md:gap-8">
-            {STAYS.map((stay, i) => (
-              <Reveal key={stay.nameEn} delay={(i % 3) as 0 | 1 | 2}>
-                <Link href="/reservations" className="group block">
-                  <figure className="img-zoom relative aspect-[3/4] w-full overflow-hidden rounded-sm">
-                    <Image
-                      src={stay.image}
-                      alt={`${stay.name} 객실 전경`}
-                      fill
-                      sizes="(min-width: 768px) 33vw, 100vw"
-                      className="object-cover"
-                    />
-                  </figure>
-                  <div className="mt-6 flex items-baseline justify-between">
-                    <h3 className="font-serif text-xl text-ink">{stay.name}</h3>
-                    <span className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-stone">
-                      {stay.nameEn}
-                    </span>
-                  </div>
-                  <p className="mt-3 text-sm leading-7 text-stone">{stay.description}</p>
-                  <p className="mt-3 text-xs tracking-wide text-bronze">{stay.capacity}</p>
-                  <span className="mt-5 inline-block border-b border-ink/25 pb-0.5 text-sm text-ink transition-all duration-300 group-hover:border-ink">
-                    자세히 보기 →
+            {sceneCards.map((space, i) => (
+              <Reveal key={space.nameEn} delay={(i % 3) as 0 | 1 | 2}>
+                <figure className="img-zoom relative aspect-[3/4] w-full overflow-hidden rounded-sm">
+                  <Image
+                    src={space.image}
+                    alt={`${space.name} 전경`}
+                    fill
+                    sizes="(min-width: 768px) 33vw, 100vw"
+                    className="object-cover"
+                  />
+                </figure>
+                <div className="mt-6 flex items-baseline justify-between">
+                  <h3 className="font-serif text-xl text-ink">{space.name}</h3>
+                  <span className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-stone">
+                    {space.nameEn}
                   </span>
-                </Link>
+                </div>
+                {space.description && (
+                  <p className="mt-3 text-sm leading-7 text-stone">{space.description}</p>
+                )}
               </Reveal>
             ))}
           </div>
+
+          <Reveal className="mt-14 flex justify-center md:mt-20">
+            <Link
+              href="/reservations"
+              className="rounded-full border border-ink/30 px-9 py-3.5 text-sm font-medium tracking-wide text-ink transition-all duration-300 hover:border-ink hover:bg-ink hover:text-cream"
+            >
+              이 집의 하루를 예약하기
+            </Link>
+          </Reveal>
         </div>
       </section>
 
@@ -289,6 +355,33 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ---------- Film (관리자 유튜브 링크가 있을 때만) ---------- */}
+      {youtubeBlock && (
+        <section className="border-y border-line bg-cream-deep py-20 md:py-28">
+          <Reveal className="mx-auto flex w-full max-w-3xl flex-col items-center px-6 text-center">
+            <p className="text-[0.7rem] font-medium uppercase tracking-[0.45em] text-bronze">
+              Film
+            </p>
+            <h2 className="mt-5 font-serif text-2xl font-light leading-snug tracking-tight text-ink md:text-3xl">
+              {youtubeBlock.title}
+            </h2>
+            {youtubeBlock.body && (
+              <p className="mt-5 max-w-md text-sm leading-7 text-stone">
+                {youtubeBlock.body}
+              </p>
+            )}
+            <a
+              href={youtubeBlock.media_url!}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-8 rounded-full border border-ink/30 px-9 py-3.5 text-sm font-medium tracking-wide text-ink transition-all duration-300 hover:border-ink hover:bg-ink hover:text-cream"
+            >
+              영상으로 미리 만나기 →
+            </a>
+          </Reveal>
+        </section>
+      )}
+
       {/* ---------- AI Concierge (dark band) ---------- */}
       <section
         id="concierge"
@@ -318,7 +411,7 @@ export default function Home() {
               아주 작은 AI
             </h2>
             <p className="mt-8 text-base leading-9 text-cream/65">
-              객실에 놓인 QR 하나면 충분합니다. 바베큐 준비부터 길 안내,
+              집 안에 놓인 QR 하나면 충분합니다. 바베큐 준비부터 길 안내,
               동네 맛집과 숨은 혜택까지 — {BRAND.name}의 컨시어지가 머무는 동안
               필요한 모든 것을 조용히 곁에서 챙깁니다.
             </p>
@@ -348,15 +441,15 @@ export default function Home() {
                 href={CONCIERGE_LINK}
                 className="rounded-full bg-cream px-10 py-4 text-sm font-medium tracking-wide text-ink transition-all duration-300 hover:bg-white hover:shadow-xl hover:shadow-black/30"
               >
-                숨 컨시어지 열기
+                압해 컨시어지 열기
               </a>
             ) : (
               <p className="rounded-full border border-white/20 px-7 py-3 text-xs tracking-[0.2em] text-cream/60">
-                체크인 시 객실 QR 카드로 만나실 수 있습니다 — 준비 중
+                체크인 시 안내되는 QR 카드로 만나실 수 있습니다 — 준비 중
               </p>
             )}
             <p className="max-w-md text-xs leading-6 text-cream/40">
-              숨 컨시어지는 앱 설치 없이 브라우저에서 바로 열리는
+              압해 컨시어지는 앱 설치 없이 브라우저에서 바로 열리는
               투숙객 전용 서비스입니다.
             </p>
           </Reveal>
@@ -389,6 +482,38 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ---------- Voices (관리자 이용 후기가 있을 때만) ---------- */}
+      {testimonials.length > 0 && (
+        <section className="py-24 md:py-36">
+          <div className="mx-auto w-full max-w-6xl px-6 md:px-10">
+            <Reveal className="text-center">
+              <p className="text-[0.7rem] font-medium uppercase tracking-[0.45em] text-bronze">
+                Voices
+              </p>
+              <h2 className="mt-5 font-serif text-3xl font-light tracking-tight text-ink md:text-4xl">
+                머문 이들의 기록
+              </h2>
+            </Reveal>
+            <div className="mt-16 grid gap-x-10 gap-y-14 md:grid-cols-3">
+              {testimonials.map((t, i) => (
+                <Reveal key={t.id} delay={(i % 3) as 0 | 1 | 2}>
+                  <blockquote className="border-t border-ink/15 pt-6">
+                    <p className="font-serif text-lg font-light leading-9 text-ink">
+                      “{t.title}”
+                    </p>
+                    {t.body && (
+                      <footer className="mt-4 text-xs tracking-wide text-stone">
+                        — {t.body}
+                      </footer>
+                    )}
+                  </blockquote>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ---------- Location ---------- */}
       <section id="location" className="scroll-mt-20 py-24 md:py-36">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 md:flex-row md:items-start md:justify-between md:px-10">
@@ -397,9 +522,9 @@ export default function Home() {
               Location
             </p>
             <h2 className="mt-5 font-serif text-3xl font-light leading-snug tracking-tight text-ink md:text-4xl">
-              도시에서 멀지 않지만,
+              다리 하나를 건너면,
               <br />
-              충분히 깊은 곳
+              섬의 시간이 시작됩니다
             </h2>
           </Reveal>
           <Reveal delay={1} className="flex max-w-sm flex-col gap-8 text-sm leading-7">
@@ -407,11 +532,7 @@ export default function Home() {
               <p className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-stone">
                 Address
               </p>
-              <p className="mt-2 text-ink-soft">
-                주소는 예약 확정 후 안내드립니다.
-                <br />
-                (프라이빗 스테이 특성상 비공개)
-              </p>
+              <p className="mt-2 text-ink-soft">{BRAND.address}</p>
             </div>
             <div>
               <p className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-stone">

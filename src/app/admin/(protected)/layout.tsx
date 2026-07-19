@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { signOutAction } from "../actions";
 import { AdminNav } from "./admin-nav";
+import { BRAND } from "@/lib/brand";
 
 export default async function AdminProtectedLayout({
   children,
@@ -33,7 +34,7 @@ export default async function AdminProtectedLayout({
       <header className="flex items-center justify-between border-b border-stone-200 bg-white px-6 py-4 sm:px-10">
         <div>
           <p className="text-xs font-semibold tracking-[0.2em] text-teal-700 uppercase">
-            StaySoom
+            {BRAND.nameEn}
           </p>
           <h1 className="text-lg font-bold text-stone-900">관리자 대시보드</h1>
         </div>

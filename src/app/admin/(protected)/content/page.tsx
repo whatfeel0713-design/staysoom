@@ -7,7 +7,8 @@ export default async function AdminContentPage() {
   const supabase = await createClient();
   const { data: blocks } = await supabase
     .from("content_blocks")
-    .select("id, type, title, media_url, is_active, created_at")
+    .select("id, type, title, media_url, body, sort_order, is_active, created_at")
+    .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false });
 
   return (
@@ -45,6 +46,8 @@ export default async function AdminContentPage() {
                     defaultType={block.type}
                     defaultTitle={block.title}
                     defaultMediaUrl={block.media_url ?? ""}
+                    defaultBody={block.body ?? ""}
+                    defaultSortOrder={block.sort_order ?? 0}
                     defaultIsActive={block.is_active}
                   />
                   <div className="mt-4 flex gap-2">
