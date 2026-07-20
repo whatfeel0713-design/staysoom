@@ -36,9 +36,9 @@
 - [ ] 인스타그램 실제 계정 URL 연결
 
 ### 0-4. 검색 노출 기본기 (SEO)
-- [ ] `sitemap.ts` / `robots.ts` 추가 (Next.js 내장 컨벤션)
-- [ ] OG 이미지(대표 사진 기반) — 카톡/인스타 공유 시 미리보기
-- [ ] 구조화 데이터(JSON-LD `LodgingBusiness`: 주소·체크인아웃·이미지) — 구글 검색 리치 결과
+- [x] `sitemap.ts` / `robots.ts` 추가 (Next.js 내장 컨벤션, `/admin`·`/api` 크롤링 차단)
+- [x] OG 이미지 — 브랜드 마크 기반 자동 생성(`opengraph-image.tsx`). 실사진 준비 후 사진 기반으로 교체
+- [x] 구조화 데이터(JSON-LD `LodgingBusiness`: 주소·체크인아웃·단일 객실) — 랜딩에 삽입. 실사진 교체 시 `image` 필드 추가
 - [ ] 네이버 서치어드바이저 + 구글 서치 콘솔 등록
 - [ ] 네이버 플레이스 / 구글 비즈니스 프로필 등록 (숙소는 지도 검색 유입이 크다)
 
@@ -86,7 +86,7 @@
 
 ## 기술 부채·품질 (병행 처리)
 
-- [ ] `site-header.tsx`의 `react-hooks/set-state-in-effect` lint 에러 해결 (main에 존재하는 유일한 lint 에러)
+- [x] `site-header.tsx`의 `react-hooks/set-state-in-effect` lint 에러 해결 — effect 대신 렌더 중 상태 조정 패턴으로 교체 (lint 에러 0)
 - [ ] 홈이 content_blocks 조회로 dynamic 렌더링이 됨 → 트래픽 늘면 `revalidate` 캐싱 검토 (콘텐츠 변경 빈도 낮음)
 - [ ] 예약 플로우 E2E 테스트 (Playwright): 달력 마감 표시 → 접수 → 관리자 승인 경로
 - [ ] Supabase 백업 정책 확인 (무료 플랜은 7일 — 예약 데이터는 유실 시 치명적)

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 import { BRAND } from "@/lib/brand";
+import { getSiteUrl } from "@/lib/site-url";
 import { createClient } from "@/utils/supabase/server";
 
 /**
@@ -162,8 +163,32 @@ async function getContentBlocks(): Promise<ContentBlock[]> {
   }
 }
 
+/** 구글 검색 리치 결과용 구조화 데이터 (schema.org LodgingBusiness) */
+function buildLodgingJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "LodgingBusiness",
+    name: BRAND.name,
+    alternateName: BRAND.nameEnUpper,
+    description: `${BRAND.placeLine} — 하루 한 팀만 머무는 프라이빗 독채 스테이.`,
+    url: getSiteUrl(),
+    email: BRAND.email,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "수련의금길 27",
+      addressLocality: "신안군 압해읍",
+      addressRegion: "전남광주통합특별시",
+      addressCountry: "KR",
+    },
+    checkinTime: "15:00",
+    checkoutTime: "11:00",
+    numberOfRooms: 1,
+  };
+}
+
 export default async function Home() {
   const blocks = await getContentBlocks();
+  const lodgingJsonLd = buildLodgingJsonLd();
 
   const heroBanner = blocks.find((b) => b.type === "banner" && b.media_url);
   const roomBlocks = blocks.filter((b) => b.type === "room");
@@ -183,6 +208,11 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(lodgingJsonLd) }}
+      />
+
       {/* ---------- Hero ---------- */}
       <section className="relative flex min-h-svh items-center justify-center overflow-hidden">
         <Image
