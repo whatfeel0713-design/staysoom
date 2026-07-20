@@ -3,11 +3,13 @@ import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 import { BRAND } from "@/lib/brand";
 import { MAP_LINKS } from "@/lib/map-links";
+import { verifyGuideAccess } from "@/lib/guide-access";
 
 /**
  * 이 페이지는 예약 확정 고객 전용 — 사이트 내 공개 링크가 없고 검색엔진
- * 비노출(noindex)이다. 체크인 안내와 함께 QR/링크로만 공유한다.
- * (추후 3b 단계에서 예약 코드 인증이 붙으면 진짜 프라이빗이 된다)
+ * 비노출(noindex)이다. `?code=` 쿼리의 예약 코드를 verify_guide_access RPC로
+ * 검증해 확정 상태 + 투숙 기간(체크인 전날~체크아웃)인 경우에만 콘텐츠를 보여준다.
+ * 코드는 확정 시 관리자 화면에서 QR/링크로 발급해 안내한다.
  */
 export const metadata: Metadata = {
   title: `압해 컨시어지 — 게스트 가이드 | ${BRAND.name}`,
@@ -144,7 +146,47 @@ const GUIDE_NAV = [
   { href: "#courses", label: "추천 코스" },
 ];
 
-export default function GuidePage() {
+export default async function GuidePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ code?: string }>;
+}) {
+  const { code } = await searchParams;
+  const hasAccess = code ? await verifyGuideAccess(code) : false;
+
+  if (!hasAccess) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center px-6 pb-24 pt-40 text-center">
+        <p className="text-[0.7rem] font-medium uppercase tracking-[0.45em] text-bronze">
+          Aphae Concierge
+        </p>
+        <h1 className="mt-6 font-serif text-3xl font-light leading-snug tracking-tight text-ink md:text-4xl">
+          예약 확정 고객을 위한
+          <br />
+          전용 안내입니다
+        </h1>
+        <p className="mt-6 max-w-sm text-sm leading-7 text-stone">
+          예약이 확정되면 안내 메일과 함께 전용 링크·QR을 보내드립니다.
+          받으신 링크로 다시 접속해 주세요.
+        </p>
+        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+          <Link
+            href="/"
+            className="rounded-full bg-ink px-9 py-3.5 text-sm font-medium tracking-wide text-cream transition-all duration-300 hover:bg-ink-soft hover:shadow-lg hover:shadow-ink/20"
+          >
+            처음으로
+          </Link>
+          <Link
+            href="/reservations"
+            className="rounded-full border border-ink/30 px-9 py-3.5 text-sm font-medium tracking-wide text-ink transition-all duration-300 hover:border-ink hover:bg-ink hover:text-cream"
+          >
+            예약하기
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col">
       {/* ---------- Hero ---------- */}

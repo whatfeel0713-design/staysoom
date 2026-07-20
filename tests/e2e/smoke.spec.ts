@@ -12,24 +12,29 @@ test("홈: 히어로가 렌더링되고 컨시어지는 소개만 노출된다",
   await expect(page.locator('a[href="/guide"]')).toHaveCount(0);
 });
 
-test("가이드: 비공개 링크로 직접 접근 가능하고 검색엔진 비노출이다", async ({
+test("가이드: 코드 없이 접근하면 예약 확정 고객 전용 안내만 보인다 (noindex)", async ({
   page,
 }) => {
   await page.goto("/guide");
   await expect(
-    page.getByRole("heading", { level: 1, name: /머무는 동안/ })
+    page.getByRole("heading", { name: /예약 확정 고객을 위한/ })
   ).toBeVisible();
+  // 코드 없이는 실제 가이드 콘텐츠(맛집 등)가 노출되지 않아야 한다
+  await expect(page.getByRole("heading", { name: /머무는 동안/ })).toHaveCount(0);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
     /noindex/
   );
+});
+
+test("가이드: 잘못된 코드로도 콘텐츠가 노출되지 않는다", async ({ page }) => {
+  await page.goto("/guide?code=invalid-code-0000");
+  await expect(
+    page.getByRole("heading", { name: /예약 확정 고객을 위한/ })
+  ).toBeVisible();
   await expect(
     page.getByRole("link", { name: /네이버 지도/ })
-  ).toHaveAttribute("href", /map\.naver\.com/);
-  await expect(page.getByRole("link", { name: /카카오맵/ })).toHaveAttribute(
-    "href",
-    /map\.kakao\.com/
-  );
+  ).toHaveCount(0);
 });
 
 test("예약 페이지: 달력·폼·개인정보 동의가 함께 노출된다", async ({ page }) => {
