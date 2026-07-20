@@ -97,7 +97,10 @@ export function AvailabilityCalendar({
   const daysInMonth = new Date(view.year, view.month + 1, 0).getDate();
 
   return (
-    <div className="rounded-2xl border border-line bg-cream p-5">
+    <div
+      data-testid="availability-calendar"
+      className="rounded-2xl border border-line bg-cream p-5"
+    >
       <div className="mb-4 flex items-center justify-between">
         <button
           type="button"
@@ -158,6 +161,7 @@ export function AvailabilityCalendar({
             <button
               key={date}
               type="button"
+              data-date={date}
               onClick={() => handleSelect(date)}
               disabled={isPast || isBlocked}
               className={`mx-auto flex h-9 w-9 items-center justify-center rounded-full text-sm transition-colors ${stateClass}`}
