@@ -5,7 +5,7 @@
  * 이 파일 밖에서 바꾸는 것들:
  * - 컬러: src/app/globals.css 상단의 CSS 변수 (--cream, --ink, --sand 등)
  * - 서체(무드): src/app/layout.tsx 의 폰트 설정
- * - 사진·공간 소개 문구: src/app/page.tsx 상단의 SPACES / EXPERIENCES / AMENITIES 배열
+ * - 공간 소개 문구·사진: src/lib/spaces.ts(SPACES) / src/app/page.tsx 상단의 EXPERIENCES / AMENITIES 배열
  */
 export const BRAND = {
   /** 한글 브랜드명 */
