@@ -24,9 +24,13 @@ export function SiteHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
+  // 라우트가 바뀌면 모바일 메뉴를 닫는다 — effect 대신 렌더 중 상태 조정 패턴
+  // (react-hooks/set-state-in-effect 규칙 준수)
+  const [lastPathname, setLastPathname] = useState(pathname);
+  if (pathname !== lastPathname) {
+    setLastPathname(pathname);
     setMenuOpen(false);
-  }, [pathname]);
+  }
 
   // Transparent-over-hero only applies on the home page before scrolling.
   const overHero = pathname === "/" && !scrolled && !menuOpen;
