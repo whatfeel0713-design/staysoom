@@ -188,3 +188,21 @@ create policy "concierge_logs_admin_all"
   이후로 연기 — Phase A는 리포 스캐폴딩과 정적 콘텐츠 이식까지만 진행하고,
   Vercel 프로젝트 생성·서브도메인 DNS 연결은 메인 사이트가 실제 도메인에서
   안정화된 뒤 별도로 진행한다.
+
+## 진행 상황 (2026-07-20)
+
+`stayaphae-concierge` 리포에 Phase A(리포 뼈대 + 정적 콘텐츠 이식)와
+Phase C(AI 챗)를 구현·푸시 완료. 원래 순서(B→C)를 바꿔 C를 먼저 한 이유는
+AI 컨시어지가 이 앱의 존재 이유를 가장 직접적으로 보여주는 기능이기
+때문 — 자세한 내용은 해당 리포의 `README.md` 참고.
+
+- **Phase A**: 정적 콘텐츠(이용안내·오시는길·맛집·코스) 이식,
+  `verify_guide_access` 재사용 + httpOnly 서명 쿠키 세션, `proxy.ts` 게이트.
+- **Phase C**: `/chat` — Claude API(`claude-opus-4-8`, 스트리밍) 기반 대화형
+  컨시어지. "이 집을 잘 아는 사람" 1인칭 페르소나, 이용 안내 전체를
+  컨텍스트로 주입, KST 시간대(노을/저녁 등)를 인지해 추천 질문·답변 톤을
+  조절. 게스트 세션 쿠키로 보호되어 예약 확정 손님만 호출 가능(비용 방어).
+  대화 로그는 아직 미저장(Phase B의 `concierge_logs` 대기).
+- **아직 안 함**: Phase B(`concierge_logs`·바베큐 신청·챗 로그 저장),
+  Vercel 프로젝트/서브도메인 연결(위 결정대로 Phase 0 이후), Phase D
+  컷오버, Phase E(IoT).
