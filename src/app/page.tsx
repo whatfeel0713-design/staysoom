@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 import { BRAND } from "@/lib/brand";
 import { MAP_LINKS } from "@/lib/map-links";
+import { SPACES } from "@/lib/spaces";
 import { getSiteUrl } from "@/lib/site-url";
 import { createClient } from "@/utils/supabase/server";
 
@@ -10,38 +11,16 @@ import { createClient } from "@/utils/supabase/server";
  * 콘텐츠 데이터 — 실제 스테이 정보/사진이 준비되면 이 배열만 교체하면 됩니다.
  * 이미지는 Unsplash 플레이스홀더입니다.
  *
- * 스테이 압해는 하루 한 팀만 받는 단일 독채 — SPACES는 "객실 목록"이 아니라
- * 그 한 채를 이루는 공간들의 장면입니다.
+ * 스테이 압해는 하루 한 팀만 받는 단일 독채 — SPACES(src/lib/spaces.ts)는
+ * "객실 목록"이 아니라 그 한 채를 이루는 공간들의 장면이며, 각 카드는
+ * /space/[slug] 상세 갤러리로 연결된다.
  */
-const SPACES = [
-  {
-    name: "숨의 방",
-    nameEn: "THE BEDROOM",
-    description: "섬의 아침빛이 통창으로 스며드는 침실. 하루의 처음을 가장 느리게 시작하는 곳.",
-    image:
-      "https://images.unsplash.com/photo-1615874959474-d609969a20ed?q=80&w=1800&auto=format&fit=crop",
-  },
-  {
-    name: "거실과 부엌",
-    nameEn: "THE LIVING",
-    description: "낮은 조도와 따뜻한 목재의 결. 창밖 풍경을 마주하고 커피를 내리는 자리.",
-    image:
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1800&auto=format&fit=crop",
-  },
-  {
-    name: "마당과 파이어핏",
-    nameEn: "THE GARDEN",
-    description: "향나무가 줄지어 선 프라이빗 마당. 밤에는 불을 올리고 하루를 조용히 정리하는 곳.",
-    image:
-      "https://images.unsplash.com/photo-1493809842364-78817add7ffb?q=80&w=1800&auto=format&fit=crop",
-  },
-];
 
 const EXPERIENCES = [
   {
     label: "01 — Stillness",
     title: "아무것도 하지 않을 자유",
-    body: `${BRAND.name}의 하루는 비워내는 것에서 시작합니다. 텔레비전 대신 바람에 흔들리는 향나무를, 알람 대신 새소리를 두었습니다. 머무는 동안만큼은 시간이 당신을 재촉하지 않습니다.`,
+    body: `${BRAND.name}의 하루는 비워내는 것에서 시작합니다.\n텔레비전 대신 바람에 흔들리는 향나무를,\n알람 대신 새소리를 두었습니다.\n머무는 동안만큼은 시간이 당신을 재촉하지 않습니다.`,
     image:
       "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1800&auto=format&fit=crop",
     alt: "빛이 스며드는 숲",
@@ -49,7 +28,7 @@ const EXPERIENCES = [
   {
     label: "02 — Morning",
     title: "섬의 아침으로 깨어나는 일",
-    body: `침대에 누운 채로 섬의 아침이 서서히 환해지는 것을 바라보세요. 준비된 원두를 내리고, 창을 열어 새벽 공기를 방 안으로 들이는 것. 그것이 ${BRAND.name}의 모닝 리추얼입니다.`,
+    body: `침대에 누운 채로 섬의 아침이 서서히 환해지는 것을 바라보세요.\n준비된 원두를 내리고,\n창을 열어 새벽 공기를 방 안으로 들이는 것.\n그것이 ${BRAND.name}의 모닝 리추얼입니다.`,
     image:
       "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1800&auto=format&fit=crop",
     alt: "창밖 풍경이 보이는 침실",
@@ -199,14 +178,28 @@ export default async function Home() {
 
   // 관리자가 등록한 공간 장면이 있으면 그것을, 없으면 기본 SPACES를 렌더링.
   // 이미지가 없는 블록은 기본 플레이스홀더 이미지를 돌려쓴다.
-  const sceneCards = roomBlocks.length
+  // 관리자 콘텐츠는 상세 갤러리가 없으므로 slug 없이 카드만 렌더링된다.
+  const sceneCards: {
+    slug: string | null;
+    name: string;
+    nameEn: string;
+    description: string;
+    image: string;
+  }[] = roomBlocks.length
     ? roomBlocks.map((b, i) => ({
+        slug: null,
         name: b.title,
         nameEn: `SCENE ${String(i + 1).padStart(2, "0")}`,
         description: b.body ?? "",
-        image: b.media_url ?? SPACES[i % SPACES.length].image,
+        image: b.media_url ?? SPACES[i % SPACES.length].heroImage,
       }))
-    : SPACES;
+    : SPACES.map((s) => ({
+        slug: s.slug,
+        name: s.name,
+        nameEn: s.nameEn,
+        description: s.tagline,
+        image: s.heroImage,
+      }));
 
   return (
     <div className="flex flex-col">
@@ -283,9 +276,11 @@ export default async function Home() {
         </Reveal>
         <Reveal delay={2}>
           <p className="mt-10 max-w-xl text-base leading-9 text-stone md:text-lg">
-            {BRAND.name}은 무언가를 더하는 여행이 아니라, 덜어내는 여행을 제안합니다.
-            소음과 일정, 해야 할 일들을 잠시 내려놓고 — 섬의 속도에 몸을 맡기는
-            것. 그 단순한 경험을 위해 공간의 모든 요소를 설계했습니다.
+            {BRAND.name}는 무언가를 더하는 여행이 아니라, 덜어내는 여행을 제안합니다.
+            <br />
+            소음과 일정, 해야 할 일들을 잠시 내려놓고 — 섬의 속도에 몸을 맡기는 것.
+            <br />
+            그 단순한 경험을 위해 공간의 모든 요소를 설계했습니다.
           </p>
         </Reveal>
       </section>
@@ -305,8 +300,9 @@ export default async function Home() {
             </div>
             <div className="max-w-sm">
               <p className="text-sm leading-7 text-stone">
-                침실부터 마당까지, 독채 전체가 오직 한 팀의 것이 됩니다. 다른
-                투숙객과 마주칠 일 없이 집의 모든 공간을 그대로 누리세요.
+                침실부터 마당까지, 독채 전체가 오직 한 팀의 것이 됩니다.
+                <br />
+                다른 투숙객과 마주칠 일 없이 집의 모든 공간을 그대로 누리세요.
               </p>
               <p className="mt-3 text-xs tracking-wide text-bronze">
                 독채 전체 사용 · {BRAND.capacityLabel}
@@ -314,29 +310,48 @@ export default async function Home() {
             </div>
           </Reveal>
 
-          <div className="mt-14 grid gap-10 md:mt-20 md:grid-cols-3 md:gap-8">
-            {sceneCards.map((space, i) => (
-              <Reveal key={space.nameEn} delay={(i % 3) as 0 | 1 | 2}>
-                <figure className="img-zoom relative aspect-[3/4] w-full overflow-hidden rounded-sm">
-                  <Image
-                    src={space.image}
-                    alt={`${space.name} 전경`}
-                    fill
-                    sizes="(min-width: 768px) 33vw, 100vw"
-                    className="object-cover"
-                  />
-                </figure>
-                <div className="mt-6 flex items-baseline justify-between">
-                  <h3 className="font-serif text-xl text-ink">{space.name}</h3>
-                  <span className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-stone">
-                    {space.nameEn}
-                  </span>
-                </div>
-                {space.description && (
-                  <p className="mt-3 text-sm leading-7 text-stone">{space.description}</p>
-                )}
-              </Reveal>
-            ))}
+          <div className="mt-14 grid gap-10 sm:grid-cols-2 md:mt-20 md:gap-8 lg:grid-cols-4">
+            {sceneCards.map((space, i) => {
+              const cardBody = (
+                <>
+                  <figure className="img-zoom relative aspect-[3/4] w-full overflow-hidden rounded-sm">
+                    <Image
+                      src={space.image}
+                      alt={`${space.name} 전경`}
+                      fill
+                      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                      className="object-cover"
+                    />
+                  </figure>
+                  <div className="mt-6 flex items-baseline justify-between">
+                    <h3 className="font-serif text-xl text-ink">{space.name}</h3>
+                    <span className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-stone">
+                      {space.nameEn}
+                    </span>
+                  </div>
+                  {space.description && (
+                    <p className="mt-3 text-sm leading-7 text-stone">{space.description}</p>
+                  )}
+                  {space.slug && (
+                    <span className="mt-4 inline-block text-xs font-medium tracking-wide text-bronze transition-colors duration-300 group-hover:text-ink">
+                      공간 자세히 보기 →
+                    </span>
+                  )}
+                </>
+              );
+
+              return (
+                <Reveal key={`${space.nameEn}-${i}`} delay={(i % 3) as 0 | 1 | 2}>
+                  {space.slug ? (
+                    <Link href={`/space/${space.slug}`} className="group block">
+                      {cardBody}
+                    </Link>
+                  ) : (
+                    <div>{cardBody}</div>
+                  )}
+                </Reveal>
+              );
+            })}
           </div>
 
           <Reveal className="mt-14 flex justify-center md:mt-20">
@@ -344,7 +359,7 @@ export default async function Home() {
               href="/reservations"
               className="rounded-full border border-ink/30 px-9 py-3.5 text-sm font-medium tracking-wide text-ink transition-all duration-300 hover:border-ink hover:bg-ink hover:text-cream"
             >
-              이 집의 하루를 예약하기
+              하루의 유일한 손님 되기
             </Link>
           </Reveal>
         </div>
@@ -378,7 +393,7 @@ export default async function Home() {
                 <h3 className="mt-5 font-serif text-2xl font-light leading-snug tracking-tight text-ink md:text-[2rem]">
                   {exp.title}
                 </h3>
-                <p className="mt-6 max-w-md text-[0.95rem] leading-8 text-stone">
+                <p className="mt-6 max-w-md whitespace-pre-line text-[0.95rem] leading-8 text-stone">
                   {exp.body}
                 </p>
               </Reveal>
@@ -435,7 +450,7 @@ export default async function Home() {
         <div className="relative z-10 mx-auto w-full max-w-6xl px-6 md:px-10">
           <Reveal className="mx-auto max-w-2xl text-center">
             <p className="text-[0.7rem] font-medium uppercase tracking-[0.45em] text-sand">
-              Soom Concierge · AI Stay
+              Aphae Concierge · AI Stay
             </p>
             <h2 className="mt-6 font-serif text-3xl font-light leading-snug tracking-tight sm:text-4xl md:text-[2.6rem]">
               머무름을 돕는,
@@ -443,9 +458,11 @@ export default async function Home() {
               아주 작은 AI
             </h2>
             <p className="mt-8 text-base leading-9 text-cream/65">
-              집 안에 놓인 QR 하나면 충분합니다. 바베큐 준비부터 길 안내,
-              동네 맛집과 숨은 혜택까지 — {BRAND.name}의 컨시어지가 머무는 동안
-              필요한 모든 것을 조용히 곁에서 챙깁니다.
+              집 안에 놓인 QR 하나면 충분합니다.
+              <br />
+              바베큐 준비부터 길 안내, 동네 맛집과 숨은 혜택까지 — {BRAND.name}
+              의 컨시어지가 머무는 동안 필요한 모든 것을 조용히 곁에서
+              챙깁니다.
             </p>
           </Reveal>
 
