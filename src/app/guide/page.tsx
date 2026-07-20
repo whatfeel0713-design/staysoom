@@ -2,10 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 import { BRAND } from "@/lib/brand";
+import { MAP_LINKS } from "@/lib/map-links";
 
+/**
+ * 이 페이지는 예약 확정 고객 전용 — 사이트 내 공개 링크가 없고 검색엔진
+ * 비노출(noindex)이다. 체크인 안내와 함께 QR/링크로만 공유한다.
+ * (추후 3b 단계에서 예약 코드 인증이 붙으면 진짜 프라이빗이 된다)
+ */
 export const metadata: Metadata = {
   title: `압해 컨시어지 — 게스트 가이드 | ${BRAND.name}`,
   description: `체크인부터 로컬 맛집, 추천 코스까지 — ${BRAND.name}에 머무는 동안 필요한 모든 안내.`,
+  robots: { index: false, follow: false },
 };
 
 /**
@@ -45,22 +52,6 @@ const MANUAL_ITEMS = [
   {
     title: "전기차 충전",
     body: "마당에 충전용 콘센트가 준비되어 있습니다. 인근 공공 급속충전소 위치는 체크인 시 함께 안내드립니다.",
-  },
-];
-
-/** 지도 앱 링크 — 주소 기반 검색 딥링크 */
-const MAP_LINKS = [
-  {
-    name: "네이버 지도",
-    href: `https://map.naver.com/p/search/${encodeURIComponent(BRAND.address)}`,
-  },
-  {
-    name: "카카오맵",
-    href: `https://map.kakao.com/link/search/${encodeURIComponent(BRAND.address)}`,
-  },
-  {
-    name: "T맵 (모바일)",
-    href: `tmap://search?name=${encodeURIComponent(BRAND.address)}`,
   },
 ];
 

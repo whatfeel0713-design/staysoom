@@ -37,9 +37,6 @@ export function SiteFooter() {
               <Link href="/#location" className="text-ink-soft/80 transition-colors hover:text-ink">
                 오시는 길
               </Link>
-              <Link href="/guide" className="text-ink-soft/80 transition-colors hover:text-ink">
-                게스트 가이드
-              </Link>
               <Link href="/reservations" className="text-ink-soft/80 transition-colors hover:text-ink">
                 예약하기
               </Link>
@@ -70,6 +67,10 @@ export function SiteFooter() {
         <div className="mt-16 flex flex-col gap-2 border-t border-line pt-8 text-xs text-stone md:flex-row md:items-center md:justify-between">
           <p>
             © {new Date().getFullYear()} {BRAND.nameEnUpper}. All rights reserved.
+            {" · "}
+            <Link href="/privacy" className="underline underline-offset-2 transition-colors hover:text-ink">
+              개인정보처리방침
+            </Link>
           </p>
           <p className="tracking-wide">{BRAND.taglineEn}</p>
         </div>
