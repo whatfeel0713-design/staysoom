@@ -89,6 +89,7 @@ test.describe("예약 폼", () => {
 
     await page.locator('input[name="guest_name"]').fill("E2E 테스트");
     await page.locator('input[name="guest_phone"]').fill("010-0000-0000");
+    await page.locator('input[name="privacy_consent"]').check();
     await page.getByRole("button", { name: "예약 접수하기" }).click();
 
     // 실제 DB 연결 시 성공 문구, 미연결(더미 env) 시 실패 안내 —

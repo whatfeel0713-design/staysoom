@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useState } from "react";
 import { createReservation, type ReservationFormState } from "./actions";
 import { AvailabilityCalendar } from "./availability-calendar";
@@ -117,6 +118,25 @@ export function ReservationForm({
           placeholder="example@email.com"
           className="field-underline"
         />
+      </label>
+
+      <label className="flex items-start gap-3 text-sm leading-6 text-stone">
+        <input
+          type="checkbox"
+          name="privacy_consent"
+          required
+          className="mt-1 h-4 w-4 accent-ink"
+        />
+        <span>
+          예약 접수를 위한 개인정보 수집·이용에 동의합니다.{" "}
+          <Link
+            href="/privacy"
+            target="_blank"
+            className="underline underline-offset-2 hover:text-ink"
+          >
+            처리방침 보기
+          </Link>
+        </span>
       </label>
 
       <button

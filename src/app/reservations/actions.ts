@@ -37,6 +37,13 @@ export async function createReservation(
     return { status: "error", message: "체크아웃 날짜는 체크인 이후여야 합니다." };
   }
 
+  if (formData.get("privacy_consent") !== "on") {
+    return {
+      status: "error",
+      message: "예약 접수를 위해 개인정보 수집·이용 동의가 필요합니다.",
+    };
+  }
+
   if (guestCount > BRAND.maxGuests) {
     return {
       status: "error",

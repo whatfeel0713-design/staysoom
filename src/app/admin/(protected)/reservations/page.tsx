@@ -1,5 +1,8 @@
+import QRCode from "qrcode";
 import { createClient } from "@/utils/supabase/server";
 import { updateReservationStatus } from "../../reservation-actions";
+import { getSiteUrl } from "@/lib/site-url";
+import { CopyGuideLinkButton } from "./copy-guide-link-button";
 
 const STATUS_LABELS: Record<string, string> = {
   pending: "대기",
@@ -37,11 +40,22 @@ export default async function AdminReservationsPage() {
     supabase
       .from("reservations")
       .select(
-        "id, guest_name, guest_phone, guest_email, check_in, check_out, guest_count, total_price, status, created_at",
+        "id, guest_name, guest_phone, guest_email, check_in, check_out, guest_count, total_price, status, guide_code, created_at",
       )
       .order("check_in", { ascending: true }),
     supabase.from("external_calendar_blocks").select("start_date, end_date"),
   ]);
+
+  const siteUrl = getSiteUrl();
+  const guideQrCodes = new Map<string, string>();
+  await Promise.all(
+    (reservations ?? [])
+      .filter((r) => r.status === "confirmed" && r.guide_code)
+      .map(async (r) => {
+        const url = `${siteUrl}/guide?code=${r.guide_code}`;
+        guideQrCodes.set(r.id, await QRCode.toDataURL(url, { width: 128, margin: 1 }));
+      }),
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -84,6 +98,27 @@ export default async function AdminReservationsPage() {
                     )}
                 </div>
               </div>
+
+              {r.status === "confirmed" && guideQrCodes.has(r.id) && (
+                <div className="mt-4 flex flex-wrap items-center gap-4 rounded-xl border border-teal-100 bg-teal-50/50 p-4">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={guideQrCodes.get(r.id)}
+                    alt="압해 컨시어지 가이드 QR"
+                    width={72}
+                    height={72}
+                    className="rounded-md bg-white p-1"
+                  />
+                  <div className="flex flex-col gap-2">
+                    <p className="text-xs text-stone-600">
+                      압해 컨시어지 가이드 — 체크인 안내와 함께 전달하세요
+                    </p>
+                    <CopyGuideLinkButton
+                      text={`${siteUrl}/guide?code=${r.guide_code}`}
+                    />
+                  </div>
+                </div>
+              )}
 
               <form
                 action={updateReservationStatus.bind(null, r.id)}

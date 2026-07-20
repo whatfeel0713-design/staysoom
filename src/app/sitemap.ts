@@ -16,11 +16,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 0.9,
     },
+    // /guide는 예약 확정 고객 전용(비공개 링크, noindex) — sitemap에 포함하지 않는다
     {
-      url: `${base}/guide`,
+      url: `${base}/privacy`,
       lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.7,
+      changeFrequency: "yearly",
+      priority: 0.3,
     },
   ];
 }

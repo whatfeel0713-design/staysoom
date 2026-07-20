@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 import { BRAND } from "@/lib/brand";
+import { MAP_LINKS } from "@/lib/map-links";
 import { getSiteUrl } from "@/lib/site-url";
 import { createClient } from "@/utils/supabase/server";
 
@@ -57,10 +58,11 @@ const EXPERIENCES = [
 
 /**
  * 압해 컨시어지(AI 스테이 프로그램) 기능 목록.
- * CONCIERGE_LINK: 현재는 게스트 가이드(/guide). AI 챗 컨시어지가 완성되면
- * 그 URL로 교체 — null로 두면 "준비 중" 안내로 돌아갑니다.
+ * 홈페이지에는 소개만 노출한다 — 실제 가이드(/guide)와 향후 컨시어지 웹앱은
+ * 예약 확정 고객에게만 QR/링크로 공유하는 프라이빗 서비스.
+ * CONCIERGE_LINK는 공개 링크가 필요해질 때만 URL을 넣을 것 (null = 소개만).
  */
-const CONCIERGE_LINK: string | null = "/guide";
+const CONCIERGE_LINK: string | null = null;
 
 const CONCIERGE_FEATURES = [
   { icon: "flame", title: "바베큐 예약", body: "원하는 시간에 맞춰 준비되는 프라이빗 바베큐." },
@@ -475,7 +477,7 @@ export default async function Home() {
               </a>
             ) : (
               <p className="rounded-full border border-white/20 px-7 py-3 text-xs tracking-[0.2em] text-cream/60">
-                체크인 시 안내되는 QR 카드로 만나실 수 있습니다 — 준비 중
+                예약이 확정된 분께 체크인 안내와 함께 QR·링크로 열어드립니다
               </p>
             )}
             <p className="max-w-md text-xs leading-6 text-cream/40">
@@ -563,6 +565,19 @@ export default async function Home() {
                 Address
               </p>
               <p className="mt-2 text-ink-soft">{BRAND.address}</p>
+              <div className="mt-4 flex flex-wrap gap-2.5">
+                {MAP_LINKS.map((link) => (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-full border border-ink/25 px-4 py-1.5 text-xs font-medium tracking-wide text-ink-soft transition-all duration-300 hover:border-ink hover:bg-ink hover:text-cream"
+                  >
+                    {link.name} →
+                  </a>
+                ))}
+              </div>
             </div>
             <div>
               <p className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-stone">

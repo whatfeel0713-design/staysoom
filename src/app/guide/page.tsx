@@ -2,10 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 import { BRAND } from "@/lib/brand";
+import { MAP_LINKS } from "@/lib/map-links";
+import { verifyGuideAccess } from "@/lib/guide-access";
 
+/**
+ * 이 페이지는 예약 확정 고객 전용 — 사이트 내 공개 링크가 없고 검색엔진
+ * 비노출(noindex)이다. `?code=` 쿼리의 예약 코드를 verify_guide_access RPC로
+ * 검증해 확정 상태 + 투숙 기간(체크인 전날~체크아웃)인 경우에만 콘텐츠를 보여준다.
+ * 코드는 확정 시 관리자 화면에서 QR/링크로 발급해 안내한다.
+ */
 export const metadata: Metadata = {
   title: `압해 컨시어지 — 게스트 가이드 | ${BRAND.name}`,
   description: `체크인부터 로컬 맛집, 추천 코스까지 — ${BRAND.name}에 머무는 동안 필요한 모든 안내.`,
+  robots: { index: false, follow: false },
 };
 
 /**
@@ -45,22 +54,6 @@ const MANUAL_ITEMS = [
   {
     title: "전기차 충전",
     body: "마당에 충전용 콘센트가 준비되어 있습니다. 인근 공공 급속충전소 위치는 체크인 시 함께 안내드립니다.",
-  },
-];
-
-/** 지도 앱 링크 — 주소 기반 검색 딥링크 */
-const MAP_LINKS = [
-  {
-    name: "네이버 지도",
-    href: `https://map.naver.com/p/search/${encodeURIComponent(BRAND.address)}`,
-  },
-  {
-    name: "카카오맵",
-    href: `https://map.kakao.com/link/search/${encodeURIComponent(BRAND.address)}`,
-  },
-  {
-    name: "T맵 (모바일)",
-    href: `tmap://search?name=${encodeURIComponent(BRAND.address)}`,
   },
 ];
 
@@ -153,7 +146,47 @@ const GUIDE_NAV = [
   { href: "#courses", label: "추천 코스" },
 ];
 
-export default function GuidePage() {
+export default async function GuidePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ code?: string }>;
+}) {
+  const { code } = await searchParams;
+  const hasAccess = code ? await verifyGuideAccess(code) : false;
+
+  if (!hasAccess) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center px-6 pb-24 pt-40 text-center">
+        <p className="text-[0.7rem] font-medium uppercase tracking-[0.45em] text-bronze">
+          Aphae Concierge
+        </p>
+        <h1 className="mt-6 font-serif text-3xl font-light leading-snug tracking-tight text-ink md:text-4xl">
+          예약 확정 고객을 위한
+          <br />
+          전용 안내입니다
+        </h1>
+        <p className="mt-6 max-w-sm text-sm leading-7 text-stone">
+          예약이 확정되면 안내 메일과 함께 전용 링크·QR을 보내드립니다.
+          받으신 링크로 다시 접속해 주세요.
+        </p>
+        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+          <Link
+            href="/"
+            className="rounded-full bg-ink px-9 py-3.5 text-sm font-medium tracking-wide text-cream transition-all duration-300 hover:bg-ink-soft hover:shadow-lg hover:shadow-ink/20"
+          >
+            처음으로
+          </Link>
+          <Link
+            href="/reservations"
+            className="rounded-full border border-ink/30 px-9 py-3.5 text-sm font-medium tracking-wide text-ink transition-all duration-300 hover:border-ink hover:bg-ink hover:text-cream"
+          >
+            예약하기
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col">
       {/* ---------- Hero ---------- */}
