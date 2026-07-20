@@ -25,6 +25,7 @@
 - 환경 변수는 `.env.local` (gitignore됨) — 목록은 `.env.local.example` 참고.
 - 아키텍처 원칙과 트러블슈팅 누적 기록은 `architecture-rules.md` 참고 (RLS 재귀 함정, Server Component 폴백 패턴 등).
 - 향후 구축 로드맵(오픈 전 체크리스트, 4순위 이후 고도화 단계)은 `roadmap.md` 참고.
+- 압해 컨시어지를 별도 웹앱(신규 리포·서브도메인)으로 분리하는 설계는 `concierge-app-design.md` 참고 (3c AI 챗·3d IoT 대상, 메인 사이트의 `guide_code`/`verify_guide_access` RPC를 그대로 재사용하는 것이 핵심).
 
 ## 배포 인프라 (확정 방향, 2026-07)
 
