@@ -180,10 +180,11 @@ create policy "concierge_logs_admin_all"
 
 세션 개선(쿠키 발급)은 Phase A에서 정적 이식과 함께 적용하는 게 효율적이다.
 
-## 지금 무엇을 먼저 할지
+## 확정된 결정 (2026-07-20)
 
-바로 스캐폴딩에 들어가도 되지만, 신규 리포 생성·Vercel 프로젝트 연결은
-"인프라를 늘리는" 결정이라 진행 전에 확인이 필요하다 — 신규 GitHub 리포 이름,
-서브도메인 이름(`concierge.` vs `app.` vs `guide.`), Vercel 프로젝트를 지금
-만들지 Phase 0(메인 사이트 배포) 이후로 미룰지 정해주시면 Phase A부터 바로
-착수한다.
+- **신규 GitHub 리포 이름**: `stayaphae-concierge`
+- **서브도메인**: `concierge.stayaphae.com`
+- **Vercel 프로젝트 연결 시점**: Phase 0(메인 사이트 배포·도메인 연결)
+  이후로 연기 — Phase A는 리포 스캐폴딩과 정적 콘텐츠 이식까지만 진행하고,
+  Vercel 프로젝트 생성·서브도메인 DNS 연결은 메인 사이트가 실제 도메인에서
+  안정화된 뒤 별도로 진행한다.
