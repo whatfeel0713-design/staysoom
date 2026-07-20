@@ -16,7 +16,7 @@ export function SiteFooter() {
             <p className="mt-6 max-w-xs text-sm leading-7 text-stone">
               {BRAND.tagline}.
               <br />
-              자연 속에서 온전한 숨을 되찾는 프라이빗 스테이.
+              {BRAND.placeLine}에서 온전한 숨을 되찾는 프라이빗 독채.
             </p>
           </div>
 
@@ -36,6 +36,9 @@ export function SiteFooter() {
               </Link>
               <Link href="/#location" className="text-ink-soft/80 transition-colors hover:text-ink">
                 오시는 길
+              </Link>
+              <Link href="/guide" className="text-ink-soft/80 transition-colors hover:text-ink">
+                게스트 가이드
               </Link>
               <Link href="/reservations" className="text-ink-soft/80 transition-colors hover:text-ink">
                 예약하기
