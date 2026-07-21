@@ -1,6 +1,10 @@
 import QRCode from "qrcode";
 import { createClient } from "@/utils/supabase/server";
-import { updateReservationStatus, updateSpecialOccasion } from "../../reservation-actions";
+import {
+  sendGuestCheckoutLetter,
+  updateReservationStatus,
+  updateSpecialOccasion,
+} from "../../reservation-actions";
 import { getSiteUrl } from "@/lib/site-url";
 import { CopyGuideLinkButton } from "./copy-guide-link-button";
 
@@ -33,6 +37,8 @@ function hasExternalOverlap(
 ) {
   return blocks.some((b) => b.start_date < checkOut && b.end_date > checkIn);
 }
+
+const todayIso = () => new Date().toISOString().slice(0, 10);
 
 export default async function AdminReservationsPage() {
   const supabase = await createClient();
@@ -159,6 +165,17 @@ export default async function AdminReservationsPage() {
                   메모 저장
                 </button>
               </form>
+
+              {r.status === "confirmed" && r.guest_email && r.check_out <= todayIso() && (
+                <form action={sendGuestCheckoutLetter.bind(null, r.id)} className="mt-3">
+                  <button
+                    type="submit"
+                    className="rounded-full border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition-colors hover:border-stone-400"
+                  >
+                    퇴실 편지 보내기 (RESEND_API_KEY 필요)
+                  </button>
+                </form>
+              )}
             </div>
           ))
         ) : (
