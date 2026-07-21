@@ -1,6 +1,10 @@
 import QRCode from "qrcode";
 import { createClient } from "@/utils/supabase/server";
-import { updateReservationStatus } from "../../reservation-actions";
+import {
+  sendGuestCheckoutLetter,
+  updateReservationStatus,
+  updateSpecialOccasion,
+} from "../../reservation-actions";
 import { getSiteUrl } from "@/lib/site-url";
 import { CopyGuideLinkButton } from "./copy-guide-link-button";
 
@@ -34,13 +38,15 @@ function hasExternalOverlap(
   return blocks.some((b) => b.start_date < checkOut && b.end_date > checkIn);
 }
 
+const todayIso = () => new Date().toISOString().slice(0, 10);
+
 export default async function AdminReservationsPage() {
   const supabase = await createClient();
   const [{ data: reservations }, { data: externalBlocks }] = await Promise.all([
     supabase
       .from("reservations")
       .select(
-        "id, guest_name, guest_phone, guest_email, check_in, check_out, guest_count, total_price, status, guide_code, created_at",
+        "id, guest_name, guest_phone, guest_email, check_in, check_out, guest_count, total_price, status, guide_code, special_occasion, created_at",
       )
       .order("check_in", { ascending: true }),
     supabase.from("external_calendar_blocks").select("start_date, end_date"),
@@ -140,6 +146,36 @@ export default async function AdminReservationsPage() {
                   상태 변경
                 </button>
               </form>
+
+              <form
+                action={updateSpecialOccasion.bind(null, r.id)}
+                className="mt-3 flex items-center gap-2"
+              >
+                <input
+                  type="text"
+                  name="special_occasion"
+                  defaultValue={r.special_occasion ?? ""}
+                  placeholder="기념일 메모 (예: 신혼여행, 생일) — 압해 컨시어지 개인화에 사용"
+                  className="w-80 max-w-full rounded-lg border border-stone-300 px-3 py-2 text-sm text-stone-900"
+                />
+                <button
+                  type="submit"
+                  className="rounded-full border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition-colors hover:border-stone-400"
+                >
+                  메모 저장
+                </button>
+              </form>
+
+              {r.status === "confirmed" && r.guest_email && r.check_out <= todayIso() && (
+                <form action={sendGuestCheckoutLetter.bind(null, r.id)} className="mt-3">
+                  <button
+                    type="submit"
+                    className="rounded-full border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition-colors hover:border-stone-400"
+                  >
+                    퇴실 편지 보내기 (RESEND_API_KEY 필요)
+                  </button>
+                </form>
+              )}
             </div>
           ))
         ) : (
