@@ -47,3 +47,23 @@ export async function updateReservationStatus(id: string, formData: FormData) {
 
   revalidatePath("/admin/reservations");
 }
+
+/**
+ * 압해 컨시어지 개인화 인사·서프라이즈 제안에 쓰이는 자유 메모(신혼여행,
+ * 생일 등). 빈 값으로 제출하면 null로 지워진다.
+ */
+export async function updateSpecialOccasion(id: string, formData: FormData) {
+  const raw = String(formData.get("special_occasion") ?? "").trim();
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("reservations")
+    .update({ special_occasion: raw || null })
+    .eq("id", id);
+
+  if (error) {
+    throw new Error("기념일 메모 저장에 실패했습니다.");
+  }
+
+  revalidatePath("/admin/reservations");
+}

@@ -1,6 +1,6 @@
 import QRCode from "qrcode";
 import { createClient } from "@/utils/supabase/server";
-import { updateReservationStatus } from "../../reservation-actions";
+import { updateReservationStatus, updateSpecialOccasion } from "../../reservation-actions";
 import { getSiteUrl } from "@/lib/site-url";
 import { CopyGuideLinkButton } from "./copy-guide-link-button";
 
@@ -40,7 +40,7 @@ export default async function AdminReservationsPage() {
     supabase
       .from("reservations")
       .select(
-        "id, guest_name, guest_phone, guest_email, check_in, check_out, guest_count, total_price, status, guide_code, created_at",
+        "id, guest_name, guest_phone, guest_email, check_in, check_out, guest_count, total_price, status, guide_code, special_occasion, created_at",
       )
       .order("check_in", { ascending: true }),
     supabase.from("external_calendar_blocks").select("start_date, end_date"),
@@ -138,6 +138,25 @@ export default async function AdminReservationsPage() {
                   className="rounded-full bg-teal-700 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-teal-800"
                 >
                   상태 변경
+                </button>
+              </form>
+
+              <form
+                action={updateSpecialOccasion.bind(null, r.id)}
+                className="mt-3 flex items-center gap-2"
+              >
+                <input
+                  type="text"
+                  name="special_occasion"
+                  defaultValue={r.special_occasion ?? ""}
+                  placeholder="기념일 메모 (예: 신혼여행, 생일) — 압해 컨시어지 개인화에 사용"
+                  className="w-80 max-w-full rounded-lg border border-stone-300 px-3 py-2 text-sm text-stone-900"
+                />
+                <button
+                  type="submit"
+                  className="rounded-full border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition-colors hover:border-stone-400"
+                >
+                  메모 저장
                 </button>
               </form>
             </div>
